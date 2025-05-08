@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Pengumuman Kelulusan PPDB</title>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #d0f4de, #ffffff 30%, #c3f5c0);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .card {
+      background-color: #fff;
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+      padding: 32px;
+      max-width: 420px;
+      width: 100%;
+      transition: 0.3s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+    }
+
+    .card h2 {
+      margin: 0 0 24px;
+      font-size: 24px;
+      color: #2e7d32;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .input-group {
+      margin-bottom: 16px;
+      position: relative;
+    }
+
+    .input-group input {
+      width: 100%;
+      padding: 12px 44px 12px 14px;
+      font-size: 15px;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+      transition: 0.2s;
+    }
+
+    .input-group svg {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #999;
+      pointer-events: none;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      font-size: 16px;
+      font-weight: 600;
+      border: none;
+      border-radius: 10px;
+      background-color: #43a047;
+      color: white;
+      cursor: pointer;
+      transition: background 0.3s ease;
+      margin-top: 10px;
+    }
+
+    button:hover {
+      background-color: #2e7d32;
+    }
+
+    .result {
+      margin-top: 24px;
+      font-size: 15px;
+      line-height: 1.6;
+    }
+
+    .success, .fail {
+      padding: 14px;
+      border-radius: 10px;
+      font-weight: 600;
+    }
+
+    .success {
+      background-color: #e6f4ea;
+      color: #256029;
+    }
+
+    .fail {
+      background-color: #fdecea;
+      color: #c62828;
+    }
+
+    a {
+      display: inline-block;
+      margin-top: 12px;
+      color: #2e7d32;
+      font-weight: 500;
+      text-decoration: none;
+    }
+
+    .info {
+      margin-top: 14px;
+      font-size: 13px;
+      color: #666;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h2><i data-lucide="graduation-cap"></i> Kelulusan PPDBM MAN Tanjungbalai </h2>
+
+    <div class="input-group">
+      <input type="text" id="nisn" placeholder="Masukkan NISN" />
+      <i data-lucide="id-card"></i>
+    </div>
+    <div class="input-group">
+      <input type="password" id="password" placeholder="Masukkan Password" />
+      <i data-lucide="lock"></i>
+    </div>
+
+    <button onclick="cekKelulusan()">
+      <i data-lucide="search" style="margin-right: 6px;"></i> Cek Kelulusan
+    </button>
+
+    <div class="result" id="hasil"></div>
+    <div class="info">Gunakan NISN dan password yang Anda daftarkan</div>
+  </div>
+
+  <script>
+    lucide.createIcons();
+
+    let data = [];
+
+    fetch('kelulusan.json')
+      .then(response => response.json())
+      .then(json => data = json)
+      .catch(error => {
+        console.error('Gagal memuat data:', error);
+        document.getElementById('hasil').innerHTML = `<div class="fail"><i data-lucide="alert-triangle"></i> Gagal memuat data kelulusan.</div>`;
+        lucide.createIcons();
+      });
+
+    function cekKelulusan() {
+      const nisn = document.getElementById('nisn').value.trim();
+      const password = document.getElementById('password').value.trim();
+      const hasilDiv = document.getElementById('hasil');
+
+      if (!nisn || !password) {
+        hasilDiv.innerHTML = `<div class="fail"><i data-lucide="info"></i> Harap isi NISN dan Password.</div>`;
+        lucide.createIcons();
+        return;
+      }
+
+      const result = data.find(item => item.NISN === nisn && item.PASSWORD === password);
+
+      if (result) {
+        hasilDiv.innerHTML = `
+          <div class="success">
+            <i data-lucide="check-circle" style="vertical-align: middle;"></i>
+            Selamat, <strong>${result["NAMA LENGKAP"]}</strong>!<br>
+            Status: <strong>${result["STATUS KELULUSAN"]}</strong>
+          </div>
+          <a href="${result["LINK PDF"]}" target="_blank">
+            <i data-lucide="file-text"></i> Lihat Surat Kelulusan
+          </a>
+        `;
+      } else {
+        hasilDiv.innerHTML = `<div class="fail"><i data-lucide="x-circle"></i> NISN atau Password salah.</div>`;
+      }
+
+      lucide.createIcons();
+    }
+  </script>
+</body>
+</html>
